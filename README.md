@@ -4,10 +4,10 @@
 
 # Немного примеров вызова
 [[makePDF? &text=`<html><body>hello world!</body></html>`]]<br>
-[[makePDF? &page=`25`]]
-[[makePDF? &page=`test/test.html?print` &flag=`F` &custom_path=`assets/files/myfolder/`]]
-[[makePDF? &id=`5` &tpl=`chunkName`]]
-[[makePDF? &id=`10` &table=`mytable` &idField=`pid` &tpl=`chunkName`]]
+[[makePDF? &page=`25`]]<br>
+[[makePDF? &page=`test/test.html?print` &flag=`F` &custom_path=`assets/files/myfolder/`]]<br>
+[[makePDF? &id=`5` &tpl=`chunkName`]]<br>
+[[makePDF? &id=`10` &table=`mytable` &idField=`pid` &tpl=`chunkName`]]<br>
 ```
 $attachFiles = $modx->runSnippet("makePDF", array('action' => 'FormLister', 'data' => $pfd_data, 'tpl' => 'zajavkaReportTpl', 'folder_name' => 'zajavka'));
 if (is_array($attachFiles)) {
