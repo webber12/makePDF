@@ -1,16 +1,22 @@
 <?php
 //примеры использования
+//
 //для вывода pdf на страницу (страница должна иметь тип application/pdf и не выводить ничего кроме данного сниппета)
+//
 // [[makePDF? &text=`<html><body>hello world!</body></html>` &flag=`S`]]
+// [[makePDF? &page=`25`]]
+// [[makePDF? &page=`test/test.html?print`]] - лучше, конечно, выводить версию для печати, иначе непредсказуемый вывод вполне предсказуем :)
+//
 //использование в сниппете prepareProcess FormLister для формирования аттача к письму
 /****
 $attachFiles = $modx->runSnippet("makePDF", array('action' => 'FormLister', 'data' => $pfd_data, 'tpl' => 'zajavkaReportTpl', 'folder_name' => 'zajavka'));
 if (is_array($attachFiles)) {
     $FormLister->config->setConfig(array('attachFiles' => $attachFiles));
 }
-***/
+****/
 //
 //параметры вызова
+//$page - id html-страницы сайта либо ее адрес (имеет приоритет)
 //$html - html-код для формирования pdf (имеет приоритет), если не задан $html используется массив $data, если и он не задан, используется связка параметров $table-$idField-$id
 //$data - массив данных для парсинга
 //$table - таблица (без префикса) для поиска строки для парсинга (default - site_content)
@@ -50,6 +56,21 @@ $out = '';
 //получаем итоговый html для pdf в переменной $doc
 $doc = false;
 $uid = '';
+if (isset($page)) {
+	$url = false;
+	if ((int)$page > 0) {
+		$url = MODX_SITE_URL . ltrim($modx->makeUrl((int)$page), '/');
+	} else if (is_string($page) && $page != '') {
+		$url = strpos($page, MODX_SITE_URL) !== false ? $page : MODX_SITE_URL . ltrim($page, '/'); 
+	} else {}
+	if ($url) {
+		ob_start();
+		$tmp = file_get_contents($url);
+		echo ($tmp);
+		$html=ob_get_contents();
+		ob_end_clean();
+	}
+}
 if ($html) {//сначала парсим из параметра $html
 	$doc = $html;
 } else {//если html напрямую не передан, пытаемся его найти сначала в массиве $data 
