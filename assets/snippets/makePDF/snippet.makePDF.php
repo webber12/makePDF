@@ -26,7 +26,7 @@ if (is_array($attachFiles)) {
 /*** что будем делать с файлом **/
 //$action - что делать с файлом. FormLister - возврат массива для attachFile, по умолчанию - simple - возвращает путь к файлу либо сам файл (используется совместно с $flag)
 //$flag флаг для mPDF, F - генерация в файл, I - отправка в поток, D- отправить и начать сохранять, S- отправить как строку
-	
+    
 /*** параметры для случая сохранения файла в папку ***/
 //$folder_name - имя папки для сохранения файла. Общий путь будет 'assets/files/' . $folder_name . '/' . date("Y") . '/' . date("m") . '/'
 //$filename - имя сохраняемого файла, вместе с расширением
@@ -45,9 +45,9 @@ $idField = isset($idField) ? trim($idField) : 'id';
 $html = isset($html) ? $html : false;
 
 if ($flag == 'F' || $action == 'FormLister') {//если планируем сохранять файл, сразу подготовим все исходные данные
-	$path = 'assets/files/' . $folder_name . '/' . date("Y") . '/' . date("m") . '/';
-	$folder = MODX_BASE_PATH . $path;
-	
+    $path = 'assets/files/' . $folder_name . '/' . date("Y") . '/' . date("m") . '/';
+    $folder = MODX_BASE_PATH . $path;
+    
 }
 
 //go
@@ -57,96 +57,96 @@ $out = '';
 $doc = false;
 $uid = '';
 if (isset($page)) {
-	$url = false;
-	if ((int)$page > 0) {
-		$url = MODX_SITE_URL . ltrim($modx->makeUrl((int)$page), '/');
-	} else if (is_string($page) && $page != '') {
-		$url = strpos($page, MODX_SITE_URL) !== false ? $page : MODX_SITE_URL . ltrim($page, '/'); 
-	} else {}
-	if ($url) {
-		ob_start();
-		$tmp = file_get_contents($url);
-		echo ($tmp);
-		$html=ob_get_contents();
-		ob_end_clean();
-	}
+    $url = false;
+    if ((int)$page > 0) {
+        $url = MODX_SITE_URL . ltrim($modx->makeUrl((int)$page), '/');
+    } else if (is_string($page) && $page != '') {
+        $url = strpos($page, MODX_SITE_URL) !== false ? $page : MODX_SITE_URL . ltrim($page, '/'); 
+    } else {}
+    if ($url) {
+        ob_start();
+        $tmp = file_get_contents($url);
+        echo ($tmp);
+        $html = ob_get_contents();
+        ob_end_clean();
+    }
 }
 if ($html) {//сначала парсим из параметра $html
-	$doc = $html;
+    $doc = $html;
 } else {//если html напрямую не передан, пытаемся его найти сначала в массиве $data 
-	$plh = array();
-	if ($tpl) {
-		$doc = $modx->getChunk($tpl);
-		if (isset($data) && is_array($data)) {
-			$plh = $data;
-			$uid = isset($plh[$idField]) ? $plh[$idField] . '_' : '';
-		} else if ($table && $idField && $id) {//если массива $data нет, то ищем в таблице
-			$q = $modx->db->query("SELECT * FROM " . $modx->getFullTableName($table) . " WHERE `" . $idField . "`='" . $id . "' LIMIT 0,1");
-			if ($modx->db->getRecordCount($q) == 1) {
-				$plh = $modx->db->getRow($q);
-				$uid = isset($plh[$idField]) ? $plh[$idField] . '_' : '';
-			}
-		} else {}
-		if (!empty($plh)) {
-			$doc = $modx->parseChunk($tpl, $plh, '[+', '+]');
-		}
-	}
+    $plh = array();
+    if ($tpl) {
+        $doc = $modx->getChunk($tpl);
+        if (isset($data) && is_array($data)) {
+            $plh = $data;
+            $uid = isset($plh[$idField]) ? $plh[$idField] . '_' : '';
+        } else if ($table && $idField && $id) {//если массива $data нет, то ищем в таблице
+            $q = $modx->db->query("SELECT * FROM " . $modx->getFullTableName($table) . " WHERE `" . $idField . "`='" . $id . "' LIMIT 0,1");
+            if ($modx->db->getRecordCount($q) == 1) {
+                $plh = $modx->db->getRow($q);
+                $uid = isset($plh[$idField]) ? $plh[$idField] . '_' : '';
+            }
+        } else {}
+        if (!empty($plh)) {
+            $doc = $modx->parseChunk($tpl, $plh, '[+', '+]');
+        }
+    }
 }
 $filename = str_replace('[%uid%]', $uid, $filename);
 
 if ($doc) {//есть текст для отправки в pdf
-	if (isset($_SESSION['perevod']) && is_array($_SESSION['perevod'])) {//hello evoBabel
-    	$doc = $modx->parseText($doc, $_SESSION['perevod'], '[%', '%]');
-	}
-	include_once (MODX_BASE_PATH . 'assets/lib/Helpers/FS.php');
-	$FS = \Helpers\FS::getInstance();
-	$dir = false;
-	if ($flag == 'F') {
-		$dir = $FS->makeDir($folder);
-		if (!$dir) {
-			$modx->logEvent(1, 1, 'Snippet makePDF: Не удалось создать директорию ' . $folder, 'Snippet makePDF: makeDir error');
-			return;
-		}
-	}
-	
-	require_once __DIR__ . '/mpdf/vendor/autoload.php';
-	$mpdf = new \Mpdf\Mpdf();
-	$mpdf->WriteHTML($doc);
-	
-	switch ($action) {
-		case 'FormLister':
-			$mpdf->Output($folder . $filename, 'F');
-			if (is_file($folder . $filename) && is_readable($folder . $filename)) {
-				$out[] = array('filepath' => $path . $filename, 'filename' => $filename);
-			} else {
-				$modx->logEvent(1, 1, 'Snippet makePDF: Не удалось прочитать файл ' . $folder . $filename, 'Snippet makePDF: FormLister error');
-			}
-			break;
-		case 'simple':
-			switch ($flag) {
-				case 'F':
-					//F: сохранить файл на сервере
-					$mpdf->Output($folder . $filename, 'F');
-					$out = $path . $filename;
-					break;
-				case 'D':
-					//D: Отправит в браузер, и начнет загружать на компьютер
-					$out = $mpdf->Output($filename, 'D');
-					break;
-				case 'I':
-					//I: отправить файл в браузер
-					$out = $mpdf->Output($filename, 'I');
-					break;
-				case 'S':
-					//S: вернуть документ как string
-					$out = $mpdf->Output($filename, 'S');
-					break;
-				default:
-					break;
-			}
-			break;
-		default:
-			break;
-	}
+    if (isset($_SESSION['perevod']) && is_array($_SESSION['perevod'])) {//hello evoBabel
+        $doc = $modx->parseText($doc, $_SESSION['perevod'], '[%', '%]');
+    }
+    include_once (MODX_BASE_PATH . 'assets/lib/Helpers/FS.php');
+    $FS = \Helpers\FS::getInstance();
+    $dir = false;
+    if ($flag == 'F') {
+        $dir = $FS->makeDir($folder);
+        if (!$dir) {
+            $modx->logEvent(1, 1, 'Snippet makePDF: Не удалось создать директорию ' . $folder, 'Snippet makePDF: makeDir error');
+            return;
+        }
+    }
+    
+    require_once __DIR__ . '/mpdf/vendor/autoload.php';
+    $mpdf = new \Mpdf\Mpdf();
+    $mpdf->WriteHTML($doc);
+    
+    switch ($action) {
+        case 'FormLister':
+            $mpdf->Output($folder . $filename, 'F');
+            if (is_file($folder . $filename) && is_readable($folder . $filename)) {
+                $out[] = array('filepath' => $path . $filename, 'filename' => $filename);
+            } else {
+                $modx->logEvent(1, 1, 'Snippet makePDF: Не удалось прочитать файл ' . $folder . $filename, 'Snippet makePDF: FormLister error');
+            }
+            break;
+        case 'simple':
+            switch ($flag) {
+                case 'F':
+                    //F: сохранить файл на сервере
+                    $mpdf->Output($folder . $filename, 'F');
+                    $out = $path . $filename;
+                    break;
+                case 'D':
+                    //D: Отправит в браузер, и начнет загружать на компьютер
+                    $out = $mpdf->Output($filename, 'D');
+                    break;
+                case 'I':
+                    //I: отправить файл в браузер
+                    $out = $mpdf->Output($filename, 'I');
+                    break;
+                case 'S':
+                    //S: вернуть документ как string
+                    $out = $mpdf->Output($filename, 'S');
+                    break;
+                default:
+                    break;
+            }
+            break;
+        default:
+            break;
+    }
 }
 return $out;
