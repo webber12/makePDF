@@ -3,7 +3,7 @@
 Работает на базе mpdf - https://github.com/mpdf/mpdf (уже установлена в пакете, так что для тех, кто не дружит с composer проблем не будет).
 
 # Немного примеров вызова
-[[makePDF? &text=`<html><body>hello world!</body></html>`]]
+[[makePDF? &text=`<html><body>hello world!</body></html>`]]<br>
 [[makePDF? &page=`25`]]
 [[makePDF? &page=`test/test.html?print` &flag=`F` &custom_path=`assets/files/myfolder/`]]
 [[makePDF? &id=`5` &tpl=`chunkName`]]
