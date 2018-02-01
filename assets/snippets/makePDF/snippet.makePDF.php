@@ -112,7 +112,7 @@ if ($doc) {//есть текст для отправки в pdf
         }
     }
     
-    require_once __DIR__ . '/mpdf/vendor/autoload.php';
+    require_once MODX_BASE_PATH . 'assets/snippets/makePDF/mpdf/vendor/autoload.php';
     $mpdf = new \Mpdf\Mpdf();
     $mpdf->WriteHTML($doc);
     
