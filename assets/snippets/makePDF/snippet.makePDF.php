@@ -44,8 +44,10 @@ $id = isset($id) ? trim($id) : false;
 $table = isset($table) ? trim($table) : 'site_content';
 $idField = isset($idField) ? trim($idField) : 'id';
 $html = isset($html) ? $html : false;
-
-if ($flag == 'F' || $action == 'FormLister') {//если планируем сохранять файл, сразу подготовим все исходные данные
+if ($action == 'FormLister') {//для prepare FormLister устанавливаем флаг принудительно
+    $flag = 'F';
+}
+if ($flag == 'F') {//если планируем сохранять файл, сразу подготовим все исходные данные
     $path = isset($custom_path) && $custom_path != '' ? $custom_path : 'assets/files/' . $folder_name . '/' . date("Y") . '/' . date("m") . '/';
     $folder = MODX_BASE_PATH . $path;
     
