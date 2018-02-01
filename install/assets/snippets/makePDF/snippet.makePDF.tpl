@@ -15,7 +15,7 @@
 //примеры использования
 //для вывода pdf на страницу (страница должна иметь тип application/pdf и не выводить ничего кроме данного сниппета)
 //
-// [[makePDF? &text=`<html><body>hello world!</body></html>` &flag=`S`]]
+// [[makePDF? &html=`<html><body>hello world!</body></html>` &flag=`S`]]
 // [[makePDF? &page=`25`]]
 // [[makePDF? &page=`test/test.html?print`]] - лучше, конечно, выводить версию для печати, иначе непредсказуемый вывод вполне предсказуем :)
 //
