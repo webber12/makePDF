@@ -21,10 +21,12 @@
 //
 //использование в сниппете prepareProcess FormLister для формирования аттача к письму
 //
+/*
 $attachFiles = $modx->runSnippet("makePDF", array('action' => 'FormLister', 'data' => $pfd_data, 'tpl' => 'zajavkaReportTpl', 'folder_name' => 'zajavka'));
 if (is_array($attachFiles)) {
     $FormLister->config->setConfig(array('attachFiles' => $attachFiles));
 }
+*/
 //
 //
 //параметры вызова
